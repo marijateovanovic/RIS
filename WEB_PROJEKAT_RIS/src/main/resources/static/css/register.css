@@ -1,0 +1,218 @@
+:root {
+    --facebook-blue: #1877f2;
+    --facebook-dark-blue: #166fe5;
+    --facebook-green: #42b72a;
+    --facebook-dark-green: #36a420;
+    --facebook-bg: #f0f2f5;
+    --facebook-card: #ffffff;
+    --facebook-text: #1c1e21;
+    --facebook-text-secondary: #65676b;
+    --facebook-border: #dddfe2;
+    --facebook-hover: #f2f2f2;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--facebook-bg);
+    font-family: Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+}
+
+.register-container {
+    width: 100%;
+    max-width: 450px;
+}
+
+.register-card {
+    background: var(--facebook-card);
+    border: 1px solid var(--facebook-border);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+    padding: 16px;
+}
+
+.register-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+    padding: 0;
+}
+
+.form-group {
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.form-control {
+    border: 1px solid var(--facebook-border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    background: var(--facebook-card);
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    width: 100%;
+    font-family: inherit;
+}
+
+.form-control:focus {
+    border-color: var(--facebook-blue);
+    box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+    outline: none;
+}
+
+.password-strength {
+    height: 4px;
+    background: #f0f2f5;
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+}
+
+.password-strength-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.strength-weak { background: #e41e3f; width: 33%; }
+.strength-medium { background: #f0c020; width: 66%; }
+.strength-strong { background: var(--facebook-green); width: 100%; }
+
+.password-requirements {
+    font-size: 0.8125rem;
+    color: var(--facebook-text-secondary);
+    margin-top: 6px;
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2px;
+    font-size: 0.8125rem;
+}
+
+.requirement i {
+    font-size: 0.6rem;
+    margin-right: 6px;
+}
+
+.requirement.valid {
+    color: var(--facebook-green);
+}
+
+.requirement.invalid {
+    color: #e41e3f;
+}
+
+.btn-register {
+    background-color: var(--facebook-green);
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: white;
+    width: 100%;
+    transition: background-color 0.2s;
+    margin-top: 8px;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.btn-register:hover {
+    background-color: var(--facebook-dark-green);
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--facebook-border);
+}
+
+.login-link a {
+    color: var(--facebook-blue);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+    font-size: 0.9375rem;
+}
+
+.login-link a:hover {
+    color: var(--facebook-dark-blue);
+    text-decoration: underline;
+}
+
+.alert {
+    border-radius: 6px;
+    border: none;
+    font-weight: 500;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    font-size: 0.9375rem;
+}
+
+.alert-danger {
+    background: #fde7e7;
+    color: #c41a36;
+    border-left: 4px solid #e41e3f;
+}
+
+.alert-success {
+    background: #e7f3e8;
+    color: #1e6e2d;
+    border-left: 4px solid var(--facebook-green);
+}
+
+.form-control.valid {
+    border-color: var(--facebook-green);
+}
+
+.form-control.invalid {
+    border-color: #e41e3f;
+}
+
+.validation-feedback {
+    font-size: 0.8125rem;
+    margin-top: 4px;
+    display: none;
+}
+
+.validation-feedback.valid {
+    color: var(--facebook-green);
+    display: block;
+}
+
+.validation-feedback.invalid {
+    color: #e41e3f;
+    display: block;
+}
+
+/* Responsive design */
+@media (max-width: 576px) {
+    .register-container {
+        max-width: 100%;
+    }
+    
+    body {
+        padding: 16px;
+    }
+    
+    .register-card {
+        padding: 12px;
+    }
+}

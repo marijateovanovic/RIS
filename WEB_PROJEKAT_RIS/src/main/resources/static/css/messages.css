@@ -1,0 +1,264 @@
+.messages-container {
+    padding: 0;
+}
+
+.page-header {
+    background: var(--facebook-card);
+    border-bottom: 1px solid var(--facebook-border);
+    padding: 16px 0;
+    margin-bottom: 16px;
+    border-radius: 0;
+}
+
+.page-header::before {
+    display: none;
+}
+
+.page-title {
+    color: var(--facebook-text);
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 4px;
+    text-align: left;
+    text-shadow: none;
+}
+
+.page-title::after {
+    display: none;
+}
+
+.page-subtitle {
+    color: var(--facebook-text-secondary);
+    font-size: 0.9375rem;
+    margin-bottom: 0;
+    opacity: 1;
+}
+
+.messages-layout {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 16px;
+    margin-top: 0;
+}
+
+.message-card {
+    background: var(--facebook-card);
+    border: 1px solid var(--facebook-border);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s;
+    height: fit-content;
+}
+
+.message-card:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: none;
+}
+
+.message-card::before {
+    display: none;
+}
+
+.card-header {
+    background: var(--facebook-card);
+    border-bottom: 1px solid var(--facebook-border);
+    padding: 12px 16px;
+    position: relative;
+}
+
+.card-header h5 {
+    font-weight: 600;
+    font-size: 1.0625rem;
+    margin: 0;
+    color: var(--facebook-text);
+}
+
+.card-header h5 i {
+    color: var(--facebook-blue);
+}
+
+.card-body {
+    padding: 16px;
+}
+
+.friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.friend-item {
+    transition: background-color 0.2s;
+    border-radius: 6px;
+}
+
+.friend-item:hover {
+    background-color: var(--facebook-hover);
+}
+
+.friend-link {
+    background: transparent;
+    border: none;
+    padding: 12px;
+    text-decoration: none;
+    color: var(--facebook-text);
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 6px;
+    width: 100%;
+}
+
+.friend-link:hover {
+    background-color: var(--facebook-hover);
+    text-decoration: none;
+    color: var(--facebook-text);
+    transform: none;
+    box-shadow: none;
+}
+
+.friend-link::before {
+    display: none;
+}
+
+.friend-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--facebook-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.friend-info {
+    flex: 1;
+    text-align: left;
+}
+
+.friend-name {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: var(--facebook-text);
+}
+
+.last-message {
+    font-size: 0.8125rem;
+    color: var(--facebook-text-secondary);
+    margin-top: 2px;
+}
+
+.online-indicator {
+    width: 8px;
+    height: 8px;
+    background: var(--facebook-green);
+    border-radius: 50%;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--facebook-text-secondary);
+}
+
+.empty-icon {
+    font-size: 2.5rem;
+    color: #bec3c9;
+    margin-bottom: 12px;
+}
+
+.empty-title {
+    font-size: 1.125rem;
+    margin-bottom: 8px;
+    color: var(--facebook-text);
+}
+
+.empty-subtitle {
+    font-size: 0.9375rem;
+    opacity: 0.8;
+    margin-bottom: 16px;
+}
+
+.welcome-state {
+    text-align: center;
+    padding: 60px 40px;
+    color: var(--facebook-text-secondary);
+}
+
+.welcome-icon {
+    font-size: 3rem;
+    color: #bec3c9;
+    margin-bottom: 20px;
+}
+
+.welcome-title {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    color: var(--facebook-text);
+    font-weight: 700;
+}
+
+.welcome-subtitle {
+    font-size: 0.9375rem;
+    margin-bottom: 24px;
+    opacity: 0.8;
+    line-height: 1.5;
+}
+
+.features-list {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--facebook-text);
+    font-size: 0.875rem;
+}
+
+.feature-item i {
+    font-size: 1rem;
+}
+
+.text-primary { color: var(--facebook-blue) !important; }
+.text-warning { color: #f0c020 !important; }
+.text-success { color: var(--facebook-green) !important; }
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .messages-layout {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .page-title {
+        font-size: 1.125rem;
+    }
+    
+    .welcome-state {
+        padding: 40px 20px;
+    }
+    
+    .welcome-icon {
+        font-size: 2.5rem;
+    }
+    
+    .features-list {
+        gap: 16px;
+        flex-direction: column;
+    }
+    
+    .friend-link {
+        padding: 10px;
+    }
+}

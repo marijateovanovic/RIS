@@ -1,0 +1,67 @@
+.access-denied-container {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.access-denied-icon {
+    font-size: 4rem;
+    color: #e41e3f;
+    margin-bottom: 1.5rem;
+}
+
+.access-denied-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--facebook-text);
+    margin-bottom: 1rem;
+}
+
+.access-denied-message {
+    font-size: 1.1rem;
+    color: var(--facebook-text-secondary);
+    margin-bottom: 2rem;
+    max-width: 500px;
+    line-height: 1.5;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.border-top {
+    border-top: 1px solid var(--facebook-border);
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.text-muted {
+    color: var(--facebook-text-secondary) !important;
+}
+
+.small {
+    font-size: 0.875rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .access-denied-title {
+        font-size: 1.5rem;
+    }
+    
+    .access-denied-message {
+        font-size: 1rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+}

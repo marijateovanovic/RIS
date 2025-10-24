@@ -1,0 +1,229 @@
+:root {
+    --facebook-blue: #1877f2;
+    --facebook-dark-blue: #166fe5;
+    --facebook-green: #42b72a;
+    --facebook-dark-green: #36a420;
+    --facebook-bg: #f0f2f5;
+    --facebook-card: #ffffff;
+    --facebook-text: #1c1e21;
+    --facebook-text-secondary: #65676b;
+    --facebook-border: #dddfe2;
+    --facebook-hover: #f2f2f2;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--facebook-bg);
+    font-family: Helvetica, Arial, sans-serif;
+    color: var(--facebook-text);
+    min-height: 100vh;
+}
+
+.navbar {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid var(--facebook-border);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 0 16px;
+    height: 56px;
+}
+
+.navbar-brand {
+    color: var(--facebook-blue) !important;
+    font-weight: bold;
+    font-size: 1.5rem;
+    text-decoration: none;
+}
+
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.nav-link {
+    color: var(--facebook-text-secondary) !important;
+    font-weight: 600;
+    padding: 8px 12px !important;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+    margin: 0 2px;
+    text-decoration: none;
+    font-size: 0.9375rem;
+}
+
+.nav-link:hover {
+    background-color: var(--facebook-hover);
+    color: var(--facebook-text) !important;
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    color: var(--facebook-text-secondary) !important;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 8px 12px !important;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+    background-color: var(--facebook-hover);
+}
+
+.container {
+    background: transparent;
+    box-shadow: none;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 16px;
+    border-radius: 0;
+}
+
+.card {
+    background: var(--facebook-card);
+    border: 1px solid var(--facebook-border);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    margin-bottom: 16px;
+    transition: box-shadow 0.2s;
+}
+
+.card:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background: var(--facebook-card);
+    border-bottom: 1px solid var(--facebook-border);
+    padding: 12px 16px;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 16px;
+}
+
+.btn-primary {
+    background-color: var(--facebook-blue);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: 600;
+    padding: 8px 16px;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 0.9375rem;
+}
+
+.btn-primary:hover {
+    background-color: var(--facebook-dark-blue);
+    color: white;
+}
+
+.btn-success {
+    background-color: var(--facebook-green);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: 600;
+    padding: 8px 16px;
+    transition: background-color 0.2s;
+}
+
+.btn-success:hover {
+    background-color: var(--facebook-dark-green);
+    color: white;
+}
+
+.btn-danger {
+    background-color: #e41e3f;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: 600;
+    padding: 8px 16px;
+    transition: background-color 0.2s;
+}
+
+.btn-danger:hover {
+    background-color: #c41a36;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #e4e6eb;
+    border: none;
+    border-radius: 6px;
+    color: var(--facebook-text);
+    font-weight: 600;
+    padding: 8px 16px;
+    transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: #d8dadf;
+    color: var(--facebook-text);
+}
+
+.form-control {
+    border: 1px solid var(--facebook-border);
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 0.9375rem;
+    background: var(--facebook-card);
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    border-color: var(--facebook-blue);
+    box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+    outline: none;
+}
+
+.alert {
+    border-radius: 6px;
+    border: none;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 0.9375rem;
+}
+
+.alert-success {
+    background: #e7f3e8;
+    color: #1e6e2d;
+    border-left: 4px solid var(--facebook-green);
+}
+
+.alert-danger {
+    background: #fde7e7;
+    color: #c41a36;
+    border-left: 4px solid #e41e3f;
+}
+
+.text-muted {
+    color: var(--facebook-text-secondary) !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        margin: 12px auto;
+        padding: 0 12px;
+    }
+    
+    .navbar-nav {
+        gap: 2px;
+    }
+    
+    .nav-link {
+        padding: 6px 8px !important;
+        font-size: 0.875rem;
+    }
+}
