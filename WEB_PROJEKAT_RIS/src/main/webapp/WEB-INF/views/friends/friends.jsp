@@ -3,9 +3,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set var="pageTitle" value="Friends" />
 
-<!-- CSRF Protection -->
-<meta name="_csrf" content="${_csrf.token}" />
-<meta name="_csrf_header" content="${_csrf.headerName}" />
 <link href="${pageContext.request.contextPath}/css/friends.css" rel="stylesheet" type="text/css">
 <style>
     :root {
@@ -208,14 +205,18 @@
                                 </div>
                             </div>
                             <div class="friend-actions">
-                                <button type="button" class="btn-confirm"
-                                    onclick="handleFriendRequestNoCSRF(${request.id}, 'accept')">
-                                    <i class="fas fa-check"></i> Confirm
-                                </button>
-                                <button type="button" class="btn-delete"
-                                    onclick="handleFriendRequestNoCSRF(${request.id}, 'reject')">
-                                    <i class="fas fa-times"></i> Delete
-                                </button>
+                                <form action="/FacebookCopy/friends/request/accept/${request.id}" method="POST" style="display: inline;">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                    <button type="submit" class="btn-confirm">
+                                        <i class="fas fa-check"></i> Confirm
+                                    </button>
+                                </form>
+                                <form action="/FacebookCopy/friends/request/reject/${request.id}" method="POST" style="display: inline;">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                    <button type="submit" class="btn-delete">
+                                        <i class="fas fa-times"></i> Delete
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </c:forEach>
@@ -240,25 +241,64 @@
                 </div>
                 <div class="card-body">
                     <c:forEach items="${allUsers}" var="otherUser">
-                        <div class="friend-item">
-                            <div class="friend-info">
-                                <div class="friend-avatar">
-                                    <c:set var="firstLetter" value="${otherUser.username.charAt(0)}" />
-                                    ${firstLetter}
+                        <!-- Check if request already sent to this user -->
+                        <c:set var="requestSent" value="false" />
+                        <c:forEach items="${sentRequests}" var="sentReq">
+                            <c:if test="${sentReq.idUser2.id == otherUser.id && sentReq.status == 'PENDING'}">
+                                <c:set var="requestSent" value="true" />
+                            </c:if>
+                        </c:forEach>
+                        
+                        <!-- Check if this user is already a friend -->
+                        <c:set var="isFriend" value="false" />
+                        <c:forEach items="${friends}" var="friend">
+                            <c:if test="${friend.id == otherUser.id}">
+                                <c:set var="isFriend" value="true" />
+                            </c:if>
+                        </c:forEach>
+                        
+                        <!-- Only show non-friends -->
+                        <c:if test="${!isFriend}">
+                            <div class="friend-item">
+                                <div class="friend-info">
+                                    <div class="friend-avatar">
+                                        <c:set var="firstLetter" value="${otherUser.username.charAt(0)}" />
+                                        ${firstLetter}
+                                    </div>
+                                    <div>
+                                        <div class="friend-name">${otherUser.username}</div>
+                                        <c:choose>
+                                            <c:when test="${requestSent}">
+                                                <div class="friend-status">
+                                                    <span class="pending-badge">Request Pending</span>
+                                                </div>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <div class="friend-status">Add as friend</div>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div class="friend-name">${otherUser.username}</div>
-                                    <div class="friend-status">Add as friend</div>
+                                <div class="friend-actions">
+                                    <c:choose>
+                                        <c:when test="${requestSent}">
+                                            <button type="button" class="btn-add" disabled style="background-color: #e4e6eb; color: #65676b; cursor: not-allowed;">
+                                                <i class="fas fa-clock"></i> Request Sent
+                                            </button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <form action="/FacebookCopy/friends/request/send" method="POST" style="display: inline;">
+                                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                                <input type="hidden" name="receiverId" value="${otherUser.id}" />
+                                                <button type="submit" class="btn-add">
+                                                    <i class="fas fa-user-plus"></i> Add Friend
+                                                </button>
+                                            </form>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </div>
-                            <div class="friend-actions">
-                                <button type="button" class="btn-add"
-                                    data-user-id="${otherUser.id}"
-                                    onclick="sendFriendRequestData(this)">
-                                    <i class="fas fa-user-plus"></i> Add Friend
-                                </button>
-                            </div>
-                        </div>
+                        </c:if>
                     </c:forEach>
                 </div>
             </div>
@@ -413,25 +453,48 @@ function checkCSRFConfig() {
     console.log('CSRF Header Meta exists:', !!csrfHeaderMeta);
     
     if (csrfMeta) {
-        console.log('CSRF Meta content length:', csrfMeta.getAttribute('content')?.length || 0);
-        console.log('CSRF Meta content:', csrfMeta.getAttribute('content'));
+        const token = csrfMeta.getAttribute('content');
+        console.log('CSRF Token length:', token?.length || 0);
+        console.log('CSRF Token:', token || '(empty)');
+        
+        if (!token || token.trim() === '') {
+            console.error('⚠️ CSRF Token is EMPTY! Forms will fail!');
+        } else {
+            console.log('✅ CSRF Token is valid');
+        }
+    } else {
+        console.error('❌ CSRF Meta tag not found!');
     }
     
     if (csrfHeaderMeta) {
-        console.log('CSRF Header Meta content:', csrfHeaderMeta.getAttribute('content'));
+        const headerName = csrfHeaderMeta.getAttribute('content');
+        console.log('CSRF Header Name:', headerName || '(empty)');
+        
+        if (!headerName || headerName.trim() === '') {
+            console.warn('⚠️ CSRF Header Name is empty - using default: X-CSRF-TOKEN');
+        } else {
+            console.log('✅ CSRF Header Name is valid');
+        }
+    } else {
+        console.error('❌ CSRF Header Meta tag not found!');
     }
+    
+    // Show how forms will work
+    console.log('---');
+    console.log('Forms use: <input type="hidden" name="_csrf" value="' + (csrfMeta?.getAttribute('content') || '') + '" />');
 }
 
 // Debug on load
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== PAGE LOADED ===');
+    console.log('=== Friends page loaded ===');
     console.log('Current URL:', window.location.href);
     
+    // Check CSRF configuration (safe - just logs info)
     checkCSRFConfig();
-    testEndpoints();
+    console.log('✅ CSRF Protection: ENABLED');
 });
 
-console.log('=== SCRIPT END ===');
+console.log('=== Friends page script loaded ===');
 </script>
 </body>
 </html>

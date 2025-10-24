@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -34,15 +35,20 @@ public class SecurityConfig {
                 .loginPage("/login").permitAll()
                 .loginProcessingUrl("/login")
                 .defaultSuccessUrl("/posts", true)
+                .failureUrl("/login?error=true")  // Redirect to login with error parameter
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutSuccessUrl("/posts")
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout=true")
+                .invalidateHttpSession(true)         
+                .deleteCookies("JSESSIONID")         
+                .clearAuthentication(true)           
+                .permitAll()
             )
             .exceptionHandling(handling -> handling
                 .accessDeniedPage("/access-denied")
-            )
-            .csrf(csrf -> csrf.disable());
+            );
 
         return http.build();
     }

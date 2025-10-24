@@ -63,7 +63,23 @@ public class MainController {
     
     //otvara login stranicu
     @GetMapping("/login")
-    public String loginPage() {
+    public String loginPage(@RequestParam(value = "error", required = false) String error,
+                           @RequestParam(value = "logout", required = false) String logout,
+                           HttpSession session,
+                           Model model) {
+        // Check for error from custom handler (if using CustomAuthenticationFailureHandler)
+        String sessionError = (String) session.getAttribute("loginError");
+        if (sessionError != null) {
+            model.addAttribute("error", sessionError);
+            session.removeAttribute("loginError");  // Clear after displaying
+        } else if (error != null) {
+            // Fallback to default error message
+            model.addAttribute("error", "Invalid username or password. Please try again.");
+        }
+        
+        if (logout != null) {
+            model.addAttribute("message", "You have been logged out successfully.");
+        }
         return "login/login";
     }
     
@@ -75,13 +91,14 @@ public class MainController {
         return "access-denied";
     }
     
-    //pokreće se kad kliknemo na dugme login (nakon što unesemo username i password)
+   
     @PostMapping("/login")
     public String login(@RequestParam String username, 
                        @RequestParam String password, 
                        HttpSession session, 
                        Model model) {
         User user = userService.findByUsername(username);
+
         if (user != null && user.getPassword().equals(password)) {
             session.setAttribute("user", user);
             return "posts";
@@ -90,6 +107,7 @@ public class MainController {
             return "login/login";
         }
     }
+    
     
     //vraća stranicu za registrovanje novog korisnika
     @GetMapping("/register")

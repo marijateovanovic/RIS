@@ -192,13 +192,16 @@
 					</a>
 				</li>
 				<li class="nav-item">
-					<button type="button" class="logout-btn" data-username="${user.username}">
-						<div class="user-avatar">
-							<c:set var="firstLetter" value="${user.username.charAt(0)}" />
-							${firstLetter}
-						</div>
-						<span>Logout</span>
-					</button>
+					<form action="<c:url value='/logout' />" method="POST" style="display: inline; margin: 0;">
+						<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+						<button type="submit" class="logout-btn" onclick="return confirm('Are you sure you want to logout?');">
+							<div class="user-avatar">
+								<c:set var="firstLetter" value="${user.username.charAt(0)}" />
+								${firstLetter}
+							</div>
+							<span>Logout</span>
+						</button>
+					</form>
 				</li>
 			</ul>
 		</c:if>
@@ -228,68 +231,31 @@
             }
         });
 
-        // Logout functionality
-        const logoutButtons = document.querySelectorAll('.logout-btn');
-        logoutButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const username = this.getAttribute('data-username');
-                
-                // Show confirmation dialog
-                if (confirm(`Are you sure you want to logout, ${username}?`)) {
-                    // Disable button and show loading
-                    const originalHTML = this.innerHTML;
-                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out...';
-                    this.disabled = true;
-                    
-                    // Perform logout using fetch API
-                    performLogout();
-                }
-            });
-        });
 
-        function performLogout() {
-            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
-            
-            // Use URLSearchParams to properly encode the form data
-            const formData = new URLSearchParams();
-            formData.append(csrfHeader, csrfToken);
-            
-            fetch('<c:url value="/logout" />', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: formData
-            })
-            .then(response => {
-                if (response.redirected) {
-                    // If server redirects, follow the redirect
-                    window.location.href = response.url;
-                } else if (response.ok) {
-                    // If successful without redirect, go to homepage
-                    window.location.href = '<c:url value="/" />';
-                } else {
-                    throw new Error('Logout failed');
-                }
-            })
-            .catch(error => {
-                console.error('Error during logout:', error);
-                alert('Logout failed. Please try again.');
-                // Reset button state
-                const logoutBtn = document.querySelector('.logout-btn');
-                if (logoutBtn) {
-                    const username = logoutBtn.getAttribute('data-username');
-                    const firstLetter = username.charAt(0);
-                    logoutBtn.innerHTML = `
-                        <div class="user-avatar">${firstLetter}</div>
-                        <span>Logout (${username})</span>
-                    `;
-                    logoutBtn.disabled = false;
-                }
-            });
+        
+        function getCsrfToken() {
+            const meta = document.querySelector('meta[name="_csrf"]');
+            return meta ? meta.getAttribute('content') : '';
         }
-
+        
+        function getCsrfHeader() {
+            const meta = document.querySelector('meta[name="_csrf_header"]');
+            const headerName = meta ? meta.getAttribute('content') : '';
+            return headerName || 'X-CSRF-TOKEN';
+        }
+        
+    
+        const csrfToken = getCsrfToken();
+        console.log('CSRF Token:', csrfToken || '(EMPTY!)');
+        console.log('Token Length:', csrfToken ? csrfToken.length : 0);
+        
+        if (!csrfToken || csrfToken.trim() === '') {
+            console.error('❌ CSRF Token is EMPTY! Forms will NOT work!');
+            console.error('➡️ Make sure application has been restarted');
+        } else {
+            console.log('✅ CSRF Token is valid - forms will work!');
+        }
+        
         // Add hover effects to cards
         const cards = document.querySelectorAll('.card');
         cards.forEach(card => {

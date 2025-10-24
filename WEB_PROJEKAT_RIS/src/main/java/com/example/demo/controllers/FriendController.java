@@ -37,6 +37,7 @@ public class FriendController {
     	//ih u model atribute (zahteve, prijateljstva, ostale korisnike)
     	model.addAttribute("user", user);
         model.addAttribute("pendingRequests", friendRequestService.getPendingRequests(user));
+        model.addAttribute("sentRequests", friendRequestService.getSentRequests(user));
         model.addAttribute("friends", friendshipService.getFriends(user));
         model.addAttribute("allUsers", userService.findAll().stream()
             .filter(u -> u.getId() != user.getId())
