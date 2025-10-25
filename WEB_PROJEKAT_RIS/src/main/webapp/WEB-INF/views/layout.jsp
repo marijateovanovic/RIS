@@ -149,6 +149,34 @@
         font-weight: 600;
         font-size: 0.75rem;
     }
+    
+    /* Notification Badge */
+    .notification-badge {
+        position: relative;
+    }
+    
+    .badge-count {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        background: #e41e3f;
+        color: white;
+        font-size: 0.625rem;
+        font-weight: 700;
+        min-width: 18px;
+        height: 18px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+        border: 2px solid white;
+        display: none;
+    }
+    
+    .badge-count.active {
+        display: flex;
+    }
 </style>
 </head>
 <body>
@@ -187,8 +215,9 @@
 					</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="<c:url value='/messages' />">
+					<a class="nav-link notification-badge" href="<c:url value='/messages' />" id="messagesLink">
 						<i class="fas fa-envelope"></i>
+						<span class="badge-count" id="messageBadge">0</span>
 					</a>
 				</li>
 				<li class="nav-item">
@@ -266,6 +295,42 @@
                 this.style.transform = 'translateY(0)';
             });
         });
+        
+        function updateMessageNotification() {
+            fetch('${pageContext.request.contextPath}/messages/unread-count', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                }
+                throw new Error('Failed to fetch unread count');
+            })
+            .then(count => {
+                const badge = document.getElementById('messageBadge');
+                if (badge) {
+                    const unreadCount = parseInt(count);
+                    if (unreadCount > 0) {
+                        badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                        badge.classList.add('active');
+                    } else {
+                        badge.classList.remove('active');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching unread message count:', error);
+            });
+        }
+        
+        updateMessageNotification();
+        
+        // Poll every 10 seconds for new messages
+        setInterval(updateMessageNotification, 10000);
     });
 </script>
 </body>

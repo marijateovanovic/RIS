@@ -33,6 +33,7 @@ public class MessageService {
         message.setIdUser2(receiver);
         message.setContent(content);
         message.setSentAt(new Timestamp(System.currentTimeMillis()));
+        message.setRead(false); 
         
         return messageRepository.save(message);
     }
@@ -47,5 +48,32 @@ public class MessageService {
 
     public void deleteMessage(Long messageId) {
         messageRepository.deleteById(messageId);
+    }
+    
+    public long getUnreadMessageCount(User user) {
+        return messageRepository.countUnreadMessages(user);
+    }
+    
+    public List<Message> getUnreadMessages(User user) {
+        return messageRepository.findUnreadMessages(user);
+    }
+    
+    public void markConversationAsRead(User currentUser, User otherUser) {
+        List<Message> conversation = messageRepository.findConversationBetweenUsers(currentUser, otherUser);
+        for (Message message : conversation) {
+            // Only mark as read if current user is the receiver
+            if (message.getIdUser2().getId() == currentUser.getId() && !message.isRead()) {
+                message.setRead(true);
+                messageRepository.save(message);
+            }
+        }
+    }
+    
+    public void markMessageAsRead(Long messageId) {
+        Message message = messageRepository.findById(messageId).orElse(null);
+        if (message != null && !message.isRead()) {
+            message.setRead(true);
+            messageRepository.save(message);
+        }
     }
 }

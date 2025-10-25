@@ -54,6 +54,10 @@ public class MessageController {
         
         //izlistava sve poruke na ekran
         List<Message> conversation = messageService.getConversation(user, friend);
+        
+        // Mark all messages in this conversation as read
+        messageService.markConversationAsRead(user, friend);
+        
         model.addAttribute("user", user);
         model.addAttribute("conversation", conversation);
         model.addAttribute("friend", friend);
@@ -76,6 +80,17 @@ public class MessageController {
         }
         
         return "redirect:/messages/conversation/" + receiverId;
+    }
+    
+    // API endpoint to get unread message count (for AJAX polling)
+    @GetMapping("/unread-count")
+    @ResponseBody
+    public long getUnreadCount(Authentication authentication) {
+        User user = getCurrentUser(authentication);
+        if (user == null) {
+            return 0;
+        }
+        return messageService.getUnreadMessageCount(user);
     }
     
     // Dobavalja informacije o trenutno ulogovanom korisniku (ime, id, poruke, prijatelje, postove, da li je USER ili ADMIN)

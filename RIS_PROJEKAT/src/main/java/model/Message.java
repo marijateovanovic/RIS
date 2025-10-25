@@ -25,6 +25,9 @@ public class Message implements Serializable {
 	@Column(name="sent_at")
 	private Timestamp sentAt;
 
+	@Column(name="is_read")
+	private boolean isRead;
+
 	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JoinColumn(name="sender_id")
@@ -76,6 +79,14 @@ public class Message implements Serializable {
 
 	public void setIdUser2(User idUser2) {
 		this.idUser2 = idUser2;
+	}
+
+	public boolean isRead() {
+		return this.isRead;
+	}
+
+	public void setRead(boolean isRead) {
+		this.isRead = isRead;
 	}
 
 }
