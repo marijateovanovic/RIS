@@ -202,7 +202,6 @@
         font-size: 0.8125rem;
     }
     
-    /* Step 9c: Post image display styles */
     .post-image {
         width: 100%;
         max-height: 500px;
@@ -263,7 +262,6 @@
                                     ${post.content}
                                 </div>
                                 
-                                <!-- Step 9d: Display post image if exists -->
                                 <c:if test="${not empty post.imagePath}">
                                     <img src="${pageContext.request.contextPath}${post.imagePath}" 
                                          alt="Post image" 

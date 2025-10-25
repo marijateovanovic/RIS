@@ -95,22 +95,17 @@ public class PostController {
         }
         
         try {
-            // Step 4a: Handle image upload if provided
             if (image != null && !image.isEmpty()) {
                 try {
                     String imagePath = saveImageLocally(image);
                     post.setImagePath(imagePath);
-                    System.out.println("Image saved successfully: " + imagePath);
                 } catch (IOException e) {
                     System.err.println("Error saving image: " + e.getMessage());
                     redirectAttributes.addFlashAttribute("error", "Failed to save image. Post saved without image.");
                 }
             } else if ("true".equals(removeImage)) {
-                // User explicitly removed the image
                 post.setImagePath(null);
-                System.out.println("Image removed by user");
             } else if (post.getId() != 0) {
-                // If editing existing post and no new image uploaded, preserve existing image
                 Post existingPost = postService.findById(post.getId());
                 if (existingPost != null && existingPost.getImagePath() != null) {
                     post.setImagePath(existingPost.getImagePath());
@@ -137,9 +132,7 @@ public class PostController {
         }
     }
     
-    // Step 4b: Save image locally and return relative path
     private String saveImageLocally(MultipartFile image) throws IOException {
-        // Generate unique filename using UUID
         String originalFilename = image.getOriginalFilename();
         String extension = "";
         if (originalFilename != null && originalFilename.contains(".")) {
@@ -147,9 +140,7 @@ public class PostController {
         }
         String uniqueFilename = UUID.randomUUID().toString() + extension;
         
-        // Save to BOTH source and target directories to ensure immediate availability
-        // 1. Save to source directory (for persistence)
-        String sourceUploadDir = "src/main/resources/static/uploads/posts/";
+         String sourceUploadDir = "src/main/resources/static/uploads/posts/";
         File sourceDirectory = new File(sourceUploadDir);
         if (!sourceDirectory.exists()) {
             sourceDirectory.mkdirs();
@@ -157,7 +148,6 @@ public class PostController {
         Path sourceFilePath = Paths.get(sourceUploadDir + uniqueFilename);
         Files.copy(image.getInputStream(), sourceFilePath, StandardCopyOption.REPLACE_EXISTING);
         
-        // 2. Save to target directory (for immediate serving)
         String targetUploadDir = "target/classes/static/uploads/posts/";
         File targetDirectory = new File(targetUploadDir);
         if (!targetDirectory.exists()) {
@@ -166,9 +156,6 @@ public class PostController {
         Path targetFilePath = Paths.get(targetUploadDir + uniqueFilename);
         Files.copy(Files.newInputStream(sourceFilePath), targetFilePath, StandardCopyOption.REPLACE_EXISTING);
         
-        System.out.println("Image saved to both source and target: " + uniqueFilename);
-        
-        // Return the relative path for database storage (accessible via web)
         return "/uploads/posts/" + uniqueFilename;
     }
     

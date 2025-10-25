@@ -153,7 +153,6 @@
         text-decoration: underline;
     }
     
-    /* Step 9a: Post image display styles */
     .post-image {
         width: 100%;
         max-height: 500px;
@@ -216,7 +215,6 @@
                                 ${post.content}
                             </div>
                             
-                            <!-- Step 9b: Display post image if exists -->
                             <c:if test="${not empty post.imagePath}">
                                 <img src="${pageContext.request.contextPath}${post.imagePath}" 
                                      alt="Post image" 
