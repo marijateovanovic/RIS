@@ -271,20 +271,20 @@
                                 
                                 <!-- Post Stats -->
                                 <div class="post-stats">
-                                    <div class="stat">
-                                        <i class="fas fa-thumbs-up"></i>
-                                        <span>156</span>
-                                    </div>
-                                    <div class="stat">
-                                        <span>24 comments</span>
-                                    </div>
-                                    <div class="stat">
-                                        <span>1.2K shares</span>
-                                    </div>
+                                    <c:if test="${likeCounts[post.id] > 0}">
+                                        <div class="stat likes-stat" data-post-id="${post.id}" style="cursor: pointer;" title="Click to see who liked this">
+                                            <i class="fas fa-thumbs-up"></i>
+                                            <span id="like-count-${post.id}">${likeCounts[post.id]}</span>
+                                        </div>
+                                    </c:if>
                                 </div>
 
                                 <!-- Action Buttons -->
                                 <div class="post-actions">
+                                    <button class="post-action like-btn" data-post-id="${post.id}" data-liked="${userLikes[post.id]}" style="color: ${userLikes[post.id] ? 'var(--facebook-blue)' : 'var(--facebook-text-secondary)'}; border: none; background: none; padding: 8px 16px; cursor: pointer; font-size: 0.9375rem; transition: background-color 0.2s;">
+                                        <i class="${userLikes[post.id] ? 'fas' : 'far'} fa-thumbs-up"></i>
+                                        Like
+                                    </button>
                                     <a href="<c:url value='/posts/edit/${post.id}' />" class="btn-edit">
                                         <i class="fas fa-edit"></i>
                                         Edit
@@ -302,12 +302,93 @@
         </div>
     </div>
 
+    <!-- Likes Modal -->
+    <div id="likesModal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+        <div style="background-color: white; margin: 10% auto; padding: 0; border-radius: 8px; width: 400px; max-width: 90%; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+            <div style="padding: 16px 20px; border-bottom: 1px solid #dddfe2; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; font-size: 1.25rem; color: #1c1e21;">People who liked this</h3>
+                <button id="closeLikesModal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #65676b; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="likesModalContent" style="padding: 16px 20px; max-height: 400px; overflow-y: auto;">
+                <div style="text-align: center; padding: 20px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #1877f2;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function confirmDelete(postId) {
             if (confirm("Delete this post?")) {
                 window.location.href = '<c:url value="/posts/delete/"/>' + postId;
             }
         }
+        
+        // Like button functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const likeButtons = document.querySelectorAll('.like-btn');
+            
+            likeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const postId = this.getAttribute('data-post-id');
+                    const icon = this.querySelector('i');
+                    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+                    
+                    // Send AJAX request
+                    fetch('${pageContext.request.contextPath}/posts/like/' + postId, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            [csrfHeader]: csrfToken
+                        },
+                        credentials: 'same-origin'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update button style
+                            if (data.liked) {
+                                icon.className = 'fas fa-thumbs-up';
+                                this.style.color = 'var(--facebook-blue)';
+                                this.setAttribute('data-liked', 'true');
+                            } else {
+                                icon.className = 'far fa-thumbs-up';
+                                this.style.color = 'var(--facebook-text-secondary)';
+                                this.setAttribute('data-liked', 'false');
+                            }
+                            
+                            // Update like count display
+                            const countElement = document.getElementById('like-count-' + postId);
+                            const statsContainer = countElement ? countElement.closest('.post-stats') : this.closest('.post-card').querySelector('.post-stats');
+                            
+                            if (data.likeCount > 0) {
+                                if (countElement) {
+                                    countElement.textContent = data.likeCount;
+                                } else {
+                                    
+                                    statsContainer.innerHTML = '<div class="stat likes-stat" data-post-id="' + postId + '" style="cursor: pointer;" title="Click to see who liked this"><i class="fas fa-thumbs-up"></i><span id="like-count-' + postId + '">' + data.likeCount + '</span></div>';
+                                }
+                            } else {
+                                
+                                if (countElement) {
+                                    countElement.closest('.stat').remove();
+                                }
+                            }
+                        } else {
+                            console.error('Error liking post:', data.message);
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while liking the post');
+                    });
+                });
+            });
+        });
         
         // Read More functionality for long posts
         document.addEventListener('DOMContentLoaded', function() {
@@ -375,6 +456,68 @@
             createPostBtn.addEventListener('click', function(e) {
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
                 this.style.pointerEvents = 'none';
+            });
+        }
+        
+        // Likes Modal functionality
+        const likesModal = document.getElementById('likesModal');
+        const likesModalContent = document.getElementById('likesModalContent');
+        const closeLikesModalBtn = document.getElementById('closeLikesModal');
+        
+        // Handle clicks on like count
+        document.addEventListener('click', function(e) {
+            const likesStat = e.target.closest('.likes-stat');
+            if (likesStat) {
+                const postId = likesStat.getAttribute('data-post-id');
+                showLikesModal(postId);
+            }
+        });
+        
+        // Close modal
+        closeLikesModalBtn.addEventListener('click', function() {
+            likesModal.style.display = 'none';
+        });
+        
+        // Close modal when clicking outside
+        likesModal.addEventListener('click', function(e) {
+            if (e.target === likesModal) {
+                likesModal.style.display = 'none';
+            }
+        });
+        
+        // Show likes modal and fetch users
+        function showLikesModal(postId) {
+            likesModal.style.display = 'block';
+            likesModalContent.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #1877f2;"></i></div>';
+            
+            fetch('${pageContext.request.contextPath}/posts/likes/' + postId, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.users && data.users.length > 0) {
+                    let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+                    data.users.forEach(username => {
+                        html += '<div style="display: flex; align-items: center; padding: 8px; border-radius: 6px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor=\'#f2f2f2\'" onmouseout="this.style.backgroundColor=\'transparent\'">';
+                        html += '<div style="width: 40px; height: 40px; background: #1877f2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.875rem; margin-right: 12px;">';
+                        html += username.charAt(0).toUpperCase();
+                        html += '</div>';
+                        html += '<span style="font-weight: 500; color: #1c1e21;">' + username + '</span>';
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                    likesModalContent.innerHTML = html;
+                } else {
+                    likesModalContent.innerHTML = '<div style="text-align: center; padding: 20px; color: #65676b;">No likes yet</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching likes:', error);
+                likesModalContent.innerHTML = '<div style="text-align: center; padding: 20px; color: #e41e3f;">Error loading likes</div>';
             });
         }
     </script>

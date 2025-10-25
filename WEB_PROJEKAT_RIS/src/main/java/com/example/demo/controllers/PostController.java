@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.services.PostService;
 import com.example.demo.services.UserService;
+import com.example.demo.services.LikeService;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +25,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -37,6 +41,9 @@ public class PostController {
     @Autowired
     private UserService userService;
     
+    @Autowired
+    private LikeService likeService;
+    
     //prikazuje stranicu koja izlistava sve postove na ekran
     @GetMapping("/posts")
     public String listPosts(Authentication authentication, Model model) {
@@ -47,8 +54,13 @@ public class PostController {
         }
         
         //izlistava postove
-        model.addAttribute("posts", postService.findAll());
+        List<Post> posts = postService.findAll();
+        model.addAttribute("posts", posts);
         model.addAttribute("user", user);
+        
+        model.addAttribute("likeCounts", likeService.getLikeCounts(posts));
+        model.addAttribute("userLikes", likeService.getUserLikes(user, posts));
+        
         return "posts";
     }
     
@@ -62,8 +74,14 @@ public class PostController {
         }
         
       //izlistava postove
-        model.addAttribute("posts", postService.findByUser(user.getId()));
+        List<Post> posts = postService.findByUser(user.getId());
+        model.addAttribute("posts", posts);
         model.addAttribute("user", user);
+        
+        // Add like counts and user likes to model
+        model.addAttribute("likeCounts", likeService.getLikeCounts(posts));
+        model.addAttribute("userLikes", likeService.getUserLikes(user, posts));
+        
         return "posts/my-posts";
     }
     
@@ -192,6 +210,73 @@ public class PostController {
         }
         
         return "redirect:/posts/my"; //refrešaj stranicu na kojoj se trenutno nalazimo
+    }
+    
+    // Toggle like/unlike on a post (AJAX endpoint)
+    @PostMapping("/posts/like/{postId}")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public Map<String, Object> toggleLike(@PathVariable Long postId, Authentication authentication) {
+        Map<String, Object> response = new HashMap<>();
+        
+        User user = getCurrentUser(authentication);
+        if (user == null) {
+            response.put("success", false);
+            response.put("message", "Not authenticated");
+            return response;
+        }
+        
+        try {
+            boolean liked = likeService.toggleLike(user, postId);
+            Post post = postService.findById(postId);
+            long likeCount = likeService.getLikeCount(post);
+            
+            response.put("success", true);
+            response.put("liked", liked);
+            response.put("likeCount", likeCount);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error toggling like: " + e.getMessage());
+        }
+        
+        return response;
+    }
+    
+    // Get list of users who liked a post (AJAX endpoint for modal)
+    @GetMapping("/posts/likes/{postId}")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public Map<String, Object> getUsersWhoLiked(@PathVariable Long postId, Authentication authentication) {
+        Map<String, Object> response = new HashMap<>();
+        
+        User user = getCurrentUser(authentication);
+        if (user == null) {
+            response.put("success", false);
+            response.put("message", "Not authenticated");
+            return response;
+        }
+        
+        try {
+            Post post = postService.findById(postId);
+            if (post == null) {
+                response.put("success", false);
+                response.put("message", "Post not found");
+                return response;
+            }
+            
+            List<User> usersWhoLiked = likeService.getUsersWhoLikedPost(post);
+            List<String> usernames = new java.util.ArrayList<>();
+            for (User u : usersWhoLiked) {
+                usernames.add(u.getUsername());
+            }
+            
+            response.put("success", true);
+            response.put("users", usernames);
+            response.put("count", usernames.size());
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error fetching users: " + e.getMessage());
+        }
+        
+        return response;
     }
     
     // Dobavalja informacije o trenutno ulogovanom korisniku (ime, id, poruke, prijatelje, postove, da li je USER ili ADMIN)    
