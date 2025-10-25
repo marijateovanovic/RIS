@@ -629,7 +629,7 @@
             downloadReportBtn.addEventListener('click', function() {
                 // Create a temporary link and trigger download
                 const link = document.createElement('a');
-                link.href = '<c:url value="/getUsersReport.pdf?clearance=ALL" />';
+                link.href = '<c:url value="/reports/users.pdf?clearance=ALL" />';
                 link.download = 'users_report_ALL.pdf';
                 document.body.appendChild(link);
                 link.click();

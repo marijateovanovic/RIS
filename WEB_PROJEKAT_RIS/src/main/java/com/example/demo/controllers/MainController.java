@@ -1,21 +1,7 @@
 package com.example.demo.controllers;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.User;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.io.OutputStream;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -25,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.demo.repositories.UserRepository;
 import com.example.demo.security.Generate_password;
 import com.example.demo.services.PostService;
 import com.example.demo.services.UserService;
@@ -33,12 +18,8 @@ import com.example.demo.services.UserService;
 @Controller
 public class MainController {
     
-	//autowired se samo koristi da ne bih morao praviti konstruktor, već automatski instanciram Bean-ove
     @Autowired
     private UserService userService;
-    
-    @Autowired
-    private UserRepository userRepository;
     
     @Autowired
     private PostService postService;
@@ -128,50 +109,5 @@ public class MainController {
         }
         String username = authentication.getName();
         return userService.findByUsername(username);
-    }
-    
-    @GetMapping("/getUsersReport.pdf")
-    public void showUsersReport(HttpServletResponse response, 
-                              @RequestParam(defaultValue = "ALL") String clearance) {
-        try {
-            // Get users based on clearance filter
-            List<User> users = userRepository.findAll();
-            
-            // Create data source
-            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(users);
-            
-            // Load and compile report template
-            InputStream is = this.getClass().getResourceAsStream("/jasperreports/report.jrxml");
-            if (is == null) {
-                throw new Exception("Report template not found!");
-            }
-            
-            JasperReport jr = JasperCompileManager.compileReport(is);
-            
-            // Set report parameters
-            Map<String, Object> params = new HashMap<String, Object>();
-            params.put("Clearance", clearance);
-            
-            JasperPrint jp = JasperFillManager.fillReport(jr, params, dataSource);
-            is.close();
-            
-            // Set download headers
-            response.setContentType("application/pdf");
-            response.addHeader("Content-disposition", "attachment; filename=users_report_" + clearance + ".pdf");
-            
-            OutputStream out = response.getOutputStream();
-            JasperExportManager.exportReportToPdfStream(jp, out);
-            out.flush();
-            out.close();
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            try {
-                response.setContentType("text/html");
-                response.getWriter().write("<h1>Error generating report</h1><pre>" + e.getMessage() + "</pre>");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
     }
 }
