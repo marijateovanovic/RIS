@@ -88,6 +88,17 @@ public class FriendController {
         return "redirect:/friends";
     }
     
+    // API endpoint to check if user has pending friend requests (for notification)
+    @GetMapping("/has-pending-requests")
+    @ResponseBody
+    public boolean hasPendingRequests(Authentication authentication) {
+        User user = getCurrentUser(authentication);
+        if (user == null) {
+            return false;
+        }
+        return !friendRequestService.getPendingRequests(user).isEmpty();
+    }
+    
     // Dobavalja informacije o trenutno ulogovanom korisniku (ime, id, poruke, prijatelje, postove, da li je USER ili ADMIN)
     private User getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {

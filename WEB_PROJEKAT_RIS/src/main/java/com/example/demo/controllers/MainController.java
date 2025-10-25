@@ -91,23 +91,6 @@ public class MainController {
         return "access-denied";
     }
     
-   
-    @PostMapping("/login")
-    public String login(@RequestParam String username, 
-                       @RequestParam String password, 
-                       HttpSession session, 
-                       Model model) {
-        User user = userService.findByUsername(username);
-
-        if (user != null && user.getPassword().equals(password)) {
-            session.setAttribute("user", user);
-            return "posts";
-        } else {
-            model.addAttribute("error", "Invalid username or password");
-            return "login/login";
-        }
-    }
-    
     
     //vraća stranicu za registrovanje novog korisnika
     @GetMapping("/register")
@@ -147,7 +130,6 @@ public class MainController {
         return userService.findByUsername(username);
     }
     
-    //preuzimanje JASPER reports - ne moraš ovaj metod učiti, za njega neće ništa pitati
     @GetMapping("/getUsersReport.pdf")
     public void showUsersReport(HttpServletResponse response, 
                               @RequestParam(defaultValue = "ALL") String clearance) throws Exception {

@@ -210,8 +210,9 @@
 					</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="<c:url value='/friends' />">
+					<a class="nav-link notification-badge" href="<c:url value='/friends' />" id="friendsLink">
 						<i class="fas fa-users"></i>
+						<span class="badge-count" id="friendBadge" style="display: none;"></span>
 					</a>
 				</li>
 				<li class="nav-item">
@@ -327,10 +328,45 @@
             });
         }
         
-        updateMessageNotification();
+        // Friend request notification polling
+        function updateFriendRequestNotification() {
+            fetch('${pageContext.request.contextPath}/friends/has-pending-requests', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                }
+                throw new Error('Failed to fetch friend request status');
+            })
+            .then(hasPending => {
+                const badge = document.getElementById('friendBadge');
+                if (badge) {
+                    if (hasPending === 'true') {
+                        badge.style.display = 'flex';
+                        badge.classList.add('active');
+                    } else {
+                        badge.style.display = 'none';
+                        badge.classList.remove('active');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching friend request status:', error);
+            });
+        }
         
-        // Poll every 10 seconds for new messages
+        // Initial checks
+        updateMessageNotification();
+        updateFriendRequestNotification();
+        
+        // Poll every 10 seconds for notifications
         setInterval(updateMessageNotification, 10000);
+        setInterval(updateFriendRequestNotification, 10000);
     });
 </script>
 </body>
