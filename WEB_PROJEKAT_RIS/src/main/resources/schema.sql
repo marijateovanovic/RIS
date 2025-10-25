@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS id_users (
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE,
-    role VARCHAR(50) DEFAULT 'USER',
+    clearance VARCHAR(50) DEFAULT 'USER',
+    profile_photo_path VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

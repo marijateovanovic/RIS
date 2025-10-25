@@ -27,6 +27,9 @@ public class User implements Serializable {
 
 	private String username;
 
+	@Column(name="profile_photo_path")
+	private String profilePhotoPath;
+
 	//bi-directional many-to-one association to FriendRequest
 	@OneToMany(mappedBy="idUser1")
 	private List<FriendRequest> idFriendRequests1;
@@ -96,6 +99,14 @@ public class User implements Serializable {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public String getProfilePhotoPath() {
+		return this.profilePhotoPath;
+	}
+
+	public void setProfilePhotoPath(String profilePhotoPath) {
+		this.profilePhotoPath = profilePhotoPath;
 	}
 
 	public List<FriendRequest> getIdFriendRequests1() {

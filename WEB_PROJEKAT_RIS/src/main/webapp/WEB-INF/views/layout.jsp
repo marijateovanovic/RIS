@@ -148,6 +148,13 @@
         color: white;
         font-weight: 600;
         font-size: 0.75rem;
+        overflow: hidden;
+    }
+    
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
     
     /* Notification Badge */
@@ -177,6 +184,133 @@
     .badge-count.active {
         display: flex;
     }
+    
+    /* Search Bar Styles */
+    .search-container {
+        position: relative;
+        flex: 1;
+        max-width: 600px;
+        margin: 0 16px;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 10px 16px 10px 40px;
+        border: none;
+        border-radius: 50px;
+        background-color: var(--facebook-bg);
+        color: var(--facebook-text);
+        font-size: 15px;
+        outline: none;
+        transition: background-color 0.2s;
+    }
+    
+    .search-input:focus {
+        background-color: #ffffff;
+        box-shadow: 0 0 0 2px var(--facebook-blue);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--facebook-text-secondary);
+        pointer-events: none;
+    }
+    
+    .search-results {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        max-height: 400px;
+        overflow-y: auto;
+        display: none;
+        z-index: 1001;
+    }
+    
+    .search-results.show {
+        display: block;
+    }
+    
+    .search-result-item {
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        border-bottom: 1px solid var(--facebook-border);
+        text-decoration: none;
+        color: var(--facebook-text);
+    }
+    
+    .search-result-item:hover {
+        background-color: var(--facebook-hover);
+    }
+    
+    .search-result-item:last-child {
+        border-bottom: none;
+    }
+    
+    .search-user-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .search-username {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--facebook-text);
+    }
+    
+    .search-email {
+        font-size: 13px;
+        color: var(--facebook-text-secondary);
+    }
+    
+    .search-action-btn {
+        padding: 6px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .search-add-btn {
+        background-color: var(--facebook-blue);
+        color: white;
+    }
+    
+    .search-add-btn:hover {
+        background-color: var(--facebook-dark-blue);
+    }
+    
+    .search-pending-btn {
+        background-color: var(--facebook-bg);
+        color: var(--facebook-text-secondary);
+        cursor: default;
+    }
+    
+    .search-friends-badge {
+        background-color: var(--facebook-green);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    .search-no-results {
+        padding: 20px;
+        text-align: center;
+        color: var(--facebook-text-secondary);
+    }
 </style>
 </head>
 <body>
@@ -186,6 +320,15 @@
 			<i class="fab fa-facebook"></i>
 			<span>facebook</span>
 		</a>
+		
+		<!-- Search Bar -->
+		<c:if test="${not empty user}">
+			<div class="search-container">
+				<i class="fas fa-search search-icon"></i>
+				<input type="text" id="userSearchInput" class="search-input" placeholder="Search for users..." autocomplete="off">
+				<div id="searchResults" class="search-results"></div>
+			</div>
+		</c:if>
 		
 		<c:if test="${not empty user}">
 			<ul class="nav-menu">
@@ -206,7 +349,12 @@
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="<c:url value='/posts/my' />">
-						<i class="fas fa-user"></i>
+						<i class="fas fa-newspaper"></i>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="<c:url value='/profile' />">
+						<i class="fas fa-user-circle"></i>
 					</a>
 				</li>
 				<li class="nav-item">
@@ -226,8 +374,15 @@
 						<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 						<button type="submit" class="logout-btn" onclick="return confirm('Are you sure you want to logout?');">
 							<div class="user-avatar">
-								<c:set var="firstLetter" value="${user.username.charAt(0)}" />
-								${firstLetter}
+								<c:choose>
+									<c:when test="${not empty user.profilePhotoPath}">
+										<img src="${pageContext.request.contextPath}${user.profilePhotoPath}" alt="${user.username}">
+									</c:when>
+									<c:otherwise>
+										<c:set var="firstLetter" value="${user.username.charAt(0)}" />
+										${firstLetter}
+									</c:otherwise>
+								</c:choose>
 							</div>
 							<span>Logout</span>
 						</button>
@@ -367,6 +522,136 @@
         // Poll every 10 seconds for notifications
         setInterval(updateMessageNotification, 10000);
         setInterval(updateFriendRequestNotification, 10000);
+        
+        // User search functionality
+        const searchInput = document.getElementById('userSearchInput');
+        const searchResults = document.getElementById('searchResults');
+        let searchTimeout;
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                
+                // Clear previous timeout
+                clearTimeout(searchTimeout);
+                
+                if (query.length < 2) {
+                    searchResults.classList.remove('show');
+                    searchResults.innerHTML = '';
+                    return;
+                }
+                
+                // Debounce search
+                searchTimeout = setTimeout(() => {
+                    performSearch(query);
+                }, 300);
+            });
+            
+            // Close search results when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!searchInput.contains(event.target) && !searchResults.contains(event.target)) {
+                    searchResults.classList.remove('show');
+                }
+            });
+            
+            // Keep search open when clicking inside
+            searchInput.addEventListener('click', function(event) {
+                event.stopPropagation();
+                if (searchResults.innerHTML) {
+                    searchResults.classList.add('show');
+                }
+            });
+        }
+        
+        function performSearch(query) {
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            fetch('${pageContext.request.contextPath}/friends/search?query=' + encodeURIComponent(query), {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Search failed');
+            })
+            .then(users => {
+                displaySearchResults(users);
+            })
+            .catch(error => {
+                console.error('Error searching users:', error);
+                searchResults.innerHTML = '<div class="search-no-results">Error searching users</div>';
+                searchResults.classList.add('show');
+            });
+        }
+        
+        function displaySearchResults(users) {
+            if (users.length === 0) {
+                searchResults.innerHTML = '<div class="search-no-results">No users found</div>';
+                searchResults.classList.add('show');
+                return;
+            }
+            
+            let html = '';
+            users.forEach(user => {
+                html += '<div class="search-result-item">';
+                html += '    <div class="search-user-info">';
+                html += '        <span class="search-username">' + escapeHtml(user.username) + '</span>';
+                html += '        <span class="search-email">' + escapeHtml(user.email) + '</span>';
+                html += '    </div>';
+                
+                if (user.isFriend) {
+                    html += '    <span class="search-friends-badge">Friends</span>';
+                } else if (user.hasSentRequest) {
+                    html += '    <button class="search-action-btn search-pending-btn" disabled>Request Sent</button>';
+                } else if (user.hasPendingRequest) {
+                    html += '    <button class="search-action-btn search-pending-btn" disabled>Pending</button>';
+                } else {
+                    html += '    <button class="search-action-btn search-add-btn" onclick="sendFriendRequestFromSearch(' + user.id + ')">Add Friend</button>';
+                }
+                
+                html += '</div>';
+            });
+            
+            searchResults.innerHTML = html;
+            searchResults.classList.add('show');
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        window.sendFriendRequestFromSearch = function(userId) {
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfParam = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '${pageContext.request.contextPath}/friends/request/send';
+            
+            const receiverInput = document.createElement('input');
+            receiverInput.type = 'hidden';
+            receiverInput.name = 'receiverId';
+            receiverInput.value = userId;
+            
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_csrf';
+            csrfInput.value = csrfToken;
+            
+            form.appendChild(receiverInput);
+            form.appendChild(csrfInput);
+            document.body.appendChild(form);
+            form.submit();
+        };
     });
 </script>
 </body>
