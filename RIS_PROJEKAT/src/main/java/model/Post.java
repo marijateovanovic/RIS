@@ -26,6 +26,9 @@ public class Post implements Serializable {
 	private Timestamp createdAt;
 
 	private String title;
+	
+	@Column(name="image_path")
+	private String imagePath;
 
 	//bi-directional many-to-one association to User
 	@ManyToOne
@@ -73,6 +76,14 @@ public class Post implements Serializable {
 
 	public void setIdUser(User idUser) {
 		this.idUser = idUser;
+	}
+
+	public String getImagePath() {
+		return this.imagePath;
+	}
+
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
 	}
 
 }

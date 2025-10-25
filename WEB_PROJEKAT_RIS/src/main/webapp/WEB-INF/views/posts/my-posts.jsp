@@ -201,6 +201,22 @@
         color: var(--facebook-text-secondary);
         font-size: 0.8125rem;
     }
+    
+    /* Step 9c: Post image display styles */
+    .post-image {
+        width: 100%;
+        max-height: 500px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-top: 12px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        border: 1px solid var(--facebook-border);
+    }
+    
+    .post-image:hover {
+        opacity: 0.97;
+    }
 </style>
 </head>
 <body>
@@ -246,6 +262,14 @@
                                 <div class="post-content">
                                     ${post.content}
                                 </div>
+                                
+                                <!-- Step 9d: Display post image if exists -->
+                                <c:if test="${not empty post.imagePath}">
+                                    <img src="${pageContext.request.contextPath}${post.imagePath}" 
+                                         alt="Post image" 
+                                         class="post-image"
+                                         loading="lazy">
+                                </c:if>
                                 
                                 <!-- Post Stats -->
                                 <div class="post-stats">

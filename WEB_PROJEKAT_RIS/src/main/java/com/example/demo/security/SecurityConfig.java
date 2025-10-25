@@ -25,6 +25,7 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/WEB-INF/views/login/**",
                         "/css/**",
+                        "/uploads/**",
                         "/register"
                 ).permitAll()
                 .requestMatchers("/friends/**", "/posts/**").hasAnyRole("ADMIN", "USER")
