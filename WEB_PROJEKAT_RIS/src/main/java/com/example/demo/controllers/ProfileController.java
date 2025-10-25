@@ -12,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.services.UserService;
+import com.example.demo.services.PostService;
+import com.example.demo.services.LikeService;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,9 +31,15 @@ public class ProfileController {
     private UserService userService;
     
     @Autowired
+    private PostService postService;
+    
+    @Autowired
+    private LikeService likeService;
+    
+    @Autowired
     private PasswordEncoder passwordEncoder;
     
-    // View profile page
+    // View own profile page
     @GetMapping
     public String viewProfile(Authentication authentication, Model model) {
         User user = getCurrentUser(authentication);
@@ -41,6 +49,32 @@ public class ProfileController {
         
         model.addAttribute("user", user);
         return "profile/profile";
+    }
+    
+    // View another user's public profile
+    @GetMapping("/view/{userId}")
+    public String viewPublicProfile(@PathVariable Long userId, Authentication authentication, Model model) {
+        User profileUser = userService.findById(userId);
+        
+        if (profileUser == null) {
+            return "redirect:/posts";
+        }
+        
+        // Get the current user for context
+        User currentUser = getCurrentUser(authentication);
+        
+        // Get all posts by this user
+        java.util.List<model.Post> posts = postService.findByUser(profileUser);
+        
+        model.addAttribute("profileUser", profileUser);
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("posts", posts);
+        model.addAttribute("likeCounts", likeService.getLikeCounts(posts));
+        if (currentUser != null) {
+            model.addAttribute("userLikes", likeService.getUserLikes(currentUser, posts));
+        }
+        
+        return "profile/public-profile";
     }
     
     // Update profile information

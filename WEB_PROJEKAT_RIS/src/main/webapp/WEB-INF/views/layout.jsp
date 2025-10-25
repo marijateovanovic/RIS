@@ -256,6 +256,34 @@
         border-bottom: none;
     }
     
+    .search-result-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+    }
+    
+    .search-user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--facebook-blue);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 16px;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+    
+    .search-user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
     .search-user-info {
         display: flex;
         flex-direction: column;
@@ -600,20 +628,29 @@
             
             let html = '';
             users.forEach(user => {
-                html += '<div class="search-result-item">';
-                html += '    <div class="search-user-info">';
-                html += '        <span class="search-username">' + escapeHtml(user.username) + '</span>';
-                html += '        <span class="search-email">' + escapeHtml(user.email) + '</span>';
+                html += '<div class="search-result-item" onclick="window.location.href=\'${pageContext.request.contextPath}/profile/view/' + user.id + '\'">';
+                html += '    <div class="search-result-left">';
+                html += '        <div class="search-user-avatar">';
+                if (user.profilePhotoPath) {
+                    html += '            <img src="${pageContext.request.contextPath}' + escapeHtml(user.profilePhotoPath) + '" alt="' + escapeHtml(user.username) + '">';
+                } else {
+                    html += escapeHtml(user.username.charAt(0).toUpperCase());
+                }
+                html += '        </div>';
+                html += '        <div class="search-user-info">';
+                html += '            <span class="search-username">' + escapeHtml(user.username) + '</span>';
+                html += '            <span class="search-email">' + escapeHtml(user.email) + '</span>';
+                html += '        </div>';
                 html += '    </div>';
                 
                 if (user.isFriend) {
                     html += '    <span class="search-friends-badge">Friends</span>';
                 } else if (user.hasSentRequest) {
-                    html += '    <button class="search-action-btn search-pending-btn" disabled>Request Sent</button>';
+                    html += '    <button class="search-action-btn search-pending-btn" disabled onclick="event.stopPropagation()">Request Sent</button>';
                 } else if (user.hasPendingRequest) {
-                    html += '    <button class="search-action-btn search-pending-btn" disabled>Pending</button>';
+                    html += '    <button class="search-action-btn search-pending-btn" disabled onclick="event.stopPropagation()">Pending</button>';
                 } else {
-                    html += '    <button class="search-action-btn search-add-btn" onclick="sendFriendRequestFromSearch(' + user.id + ')">Add Friend</button>';
+                    html += '    <button class="search-action-btn search-add-btn" onclick="event.stopPropagation(); sendFriendRequestFromSearch(' + user.id + ')">Add Friend</button>';
                 }
                 
                 html += '</div>';

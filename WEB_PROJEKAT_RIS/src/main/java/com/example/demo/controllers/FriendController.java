@@ -132,6 +132,7 @@ public class FriendController {
                 userMap.put("id", user.getId());
                 userMap.put("username", user.getUsername());
                 userMap.put("email", user.getEmail());
+                userMap.put("profilePhotoPath", user.getProfilePhotoPath());
                 
                 // Check relationship status
                 boolean isFriend = friendshipService.areFriends(currentUser, user);

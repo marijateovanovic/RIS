@@ -6,6 +6,33 @@
 </jsp:include>
 
 <style>
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: white;
+        color: var(--facebook-text);
+        border: 1px solid var(--facebook-border);
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 20px;
+        text-decoration: none;
+    }
+    
+    .back-button:hover {
+        background: var(--facebook-hover);
+        border-color: var(--facebook-blue);
+        color: var(--facebook-blue);
+    }
+    
+    .back-button i {
+        font-size: 16px;
+    }
+    
     .profile-container {
         max-width: 800px;
         margin: 0 auto;
@@ -216,6 +243,12 @@
 </style>
 
 <div class="profile-container">
+    <!-- Back Button -->
+    <button class="back-button" onclick="history.back()">
+        <i class="fas fa-arrow-left"></i>
+        Back
+    </button>
+    
     <!-- Success/Error Messages -->
     <c:if test="${not empty success}">
         <div class="alert alert-success">
