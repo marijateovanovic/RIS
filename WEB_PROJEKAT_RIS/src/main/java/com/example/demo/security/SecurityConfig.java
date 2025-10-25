@@ -1,5 +1,6 @@
 package com.example.demo.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +17,9 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -36,7 +40,7 @@ public class SecurityConfig {
                 .loginPage("/login").permitAll()
                 .loginProcessingUrl("/login")
                 .defaultSuccessUrl("/posts", true)
-                .failureUrl("/login?error=true")  // Redirect to login with error parameter
+                .failureHandler(customAuthenticationFailureHandler)
                 .permitAll()
             )
             .logout(logout -> logout

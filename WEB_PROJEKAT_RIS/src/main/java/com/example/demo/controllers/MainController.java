@@ -132,36 +132,46 @@ public class MainController {
     
     @GetMapping("/getUsersReport.pdf")
     public void showUsersReport(HttpServletResponse response, 
-                              @RequestParam(defaultValue = "ALL") String clearance) throws Exception {
-        
-        // Get users based on clearance filter
-        List<User> users = userRepository.findAll();
-        
-        
-        // Set response type
-        response.setContentType("text/html");
-        
-        // Create data source
-        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(users);
-        
-        // Load and compile report template
-        InputStream is = this.getClass().getResourceAsStream("/jasperreports/report.jrxml");
-        JasperReport jr = JasperCompileManager.compileReport(is);
-        
-        // Set report parameters
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("Clearance", clearance);
-        
-        // Generate report
-        JasperPrint jp = JasperFillManager.fillReport(jr, params, dataSource);
-        is.close();
-        
-        // Set download headers
-        response.setContentType("application/x-download");
-        response.addHeader("Content-disposition", "attachment; filename=users_report_" + clearance + ".pdf");
-        
-        // Export to PDF stream
-        OutputStream out = response.getOutputStream();
-        JasperExportManager.exportReportToPdfStream(jp, out);
+                              @RequestParam(defaultValue = "ALL") String clearance) {
+        try {
+            // Get users based on clearance filter
+            List<User> users = userRepository.findAll();
+            
+            // Create data source
+            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(users);
+            
+            // Load and compile report template
+            InputStream is = this.getClass().getResourceAsStream("/jasperreports/report.jrxml");
+            if (is == null) {
+                throw new Exception("Report template not found!");
+            }
+            
+            JasperReport jr = JasperCompileManager.compileReport(is);
+            
+            // Set report parameters
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("Clearance", clearance);
+            
+            JasperPrint jp = JasperFillManager.fillReport(jr, params, dataSource);
+            is.close();
+            
+            // Set download headers
+            response.setContentType("application/pdf");
+            response.addHeader("Content-disposition", "attachment; filename=users_report_" + clearance + ".pdf");
+            
+            OutputStream out = response.getOutputStream();
+            JasperExportManager.exportReportToPdfStream(jp, out);
+            out.flush();
+            out.close();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                response.setContentType("text/html");
+                response.getWriter().write("<h1>Error generating report</h1><pre>" + e.getMessage() + "</pre>");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 }

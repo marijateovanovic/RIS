@@ -30,6 +30,8 @@ public class User implements Serializable {
 	@Column(name="profile_photo_path")
 	private String profilePhotoPath;
 
+	private boolean blocked;
+
 	//bi-directional many-to-one association to FriendRequest
 	@OneToMany(mappedBy="idUser1")
 	private List<FriendRequest> idFriendRequests1;
@@ -107,6 +109,14 @@ public class User implements Serializable {
 
 	public void setProfilePhotoPath(String profilePhotoPath) {
 		this.profilePhotoPath = profilePhotoPath;
+	}
+
+	public boolean isBlocked() {
+		return this.blocked;
+	}
+
+	public void setBlocked(boolean blocked) {
+		this.blocked = blocked;
 	}
 
 	public List<FriendRequest> getIdFriendRequests1() {

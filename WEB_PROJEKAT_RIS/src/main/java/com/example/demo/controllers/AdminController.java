@@ -95,6 +95,115 @@ public class AdminController {
         return "redirect:/admin/users";
     }
     
+    //kada kliknemo dugme "Make Admin", pokrenuće se ovaj metod
+    @PostMapping("/users/make-admin/{userId}")
+    public String makeUserAdmin(@PathVariable Long userId, 
+                               Authentication authentication,
+                               RedirectAttributes redirectAttributes) {
+        User currentUser = getCurrentUser(authentication);
+        
+        try {
+            User userToPromote = userService.findById(userId);
+            if (userToPromote != null) {
+                // Proverava da li je korisnik već admin
+                if ("ADMIN".equals(userToPromote.getClearance())) {
+                    redirectAttributes.addFlashAttribute("error", 
+                        "User '" + userToPromote.getUsername() + "' is already an admin!");
+                    return "redirect:/admin/users";
+                }
+                
+                // Postavlja clearance na ADMIN
+                userToPromote.setClearance("ADMIN");
+                userService.save(userToPromote);
+                
+                redirectAttributes.addFlashAttribute("success", 
+                    "User '" + userToPromote.getUsername() + "' has been promoted to admin!");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "User not found!");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Error promoting user: " + e.getMessage());
+            e.printStackTrace(); // Log the error for debugging
+        }
+        
+        return "redirect:/admin/users";
+    }
+    
+    //kada kliknemo dugme "Block", pokrenuće se ovaj metod
+    @PostMapping("/users/block/{userId}")
+    public String blockUser(@PathVariable Long userId, 
+                           Authentication authentication,
+                           RedirectAttributes redirectAttributes) {
+        User currentUser = getCurrentUser(authentication);
+        
+        // Sprečava admina da blokira samog sebe
+        if (currentUser.getId() == userId) {
+            redirectAttributes.addFlashAttribute("error", "You cannot block yourself!");
+            return "redirect:/admin/users";
+        }
+        
+        try {
+            User userToBlock = userService.findById(userId);
+            if (userToBlock != null) {
+                // Proverava da li je korisnik već blokiran
+                if (userToBlock.isBlocked()) {
+                    redirectAttributes.addFlashAttribute("error", 
+                        "User '" + userToBlock.getUsername() + "' is already blocked!");
+                    return "redirect:/admin/users";
+                }
+                
+                // Blokira korisnika
+                userToBlock.setBlocked(true);
+                userService.save(userToBlock);
+                
+                redirectAttributes.addFlashAttribute("success", 
+                    "User '" + userToBlock.getUsername() + "' has been blocked successfully!");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "User not found!");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Error blocking user: " + e.getMessage());
+            e.printStackTrace(); // Log the error for debugging
+        }
+        
+        return "redirect:/admin/users";
+    }
+    
+    //kada kliknemo dugme "Unblock", pokrenuće se ovaj metod
+    @PostMapping("/users/unblock/{userId}")
+    public String unblockUser(@PathVariable Long userId, 
+                             Authentication authentication,
+                             RedirectAttributes redirectAttributes) {
+        try {
+            User userToUnblock = userService.findById(userId);
+            if (userToUnblock != null) {
+                // Proverava da li je korisnik blokiran
+                if (!userToUnblock.isBlocked()) {
+                    redirectAttributes.addFlashAttribute("error", 
+                        "User '" + userToUnblock.getUsername() + "' is not blocked!");
+                    return "redirect:/admin/users";
+                }
+                
+                // Odblokira korisnika
+                userToUnblock.setBlocked(false);
+                userService.save(userToUnblock);
+                
+                redirectAttributes.addFlashAttribute("success", 
+                    "User '" + userToUnblock.getUsername() + "' has been unblocked successfully!");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "User not found!");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", 
+                "Error unblocking user: " + e.getMessage());
+            e.printStackTrace(); // Log the error for debugging
+        }
+        
+        return "redirect:/admin/users";
+    }
+    
     /**
      * Briše sve veze korisnika pre nego što obriše samog korisnika
      */

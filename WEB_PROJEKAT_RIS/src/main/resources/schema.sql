@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS id_users (
     email VARCHAR(255) UNIQUE,
     clearance VARCHAR(50) DEFAULT 'USER',
     profile_photo_path VARCHAR(255),
+    blocked BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

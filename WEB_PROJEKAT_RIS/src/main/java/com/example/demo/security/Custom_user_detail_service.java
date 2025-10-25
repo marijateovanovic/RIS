@@ -1,6 +1,7 @@
 package com.example.demo.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,8 +19,6 @@ public class Custom_user_detail_service implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		System.out.println("=== Attempting login with: " + username);
-		
 		User user = user_repository.findByUsername(username);
 		
 		if (user == null) {
@@ -28,6 +27,11 @@ public class Custom_user_detail_service implements UserDetailsService {
 		
 		if (user == null) {
 			throw new UsernameNotFoundException("User not found with username or email: " + username);
+		}
+		
+		// Check if user is blocked
+		if (user.isBlocked()) {
+			throw new LockedException("Your account has been blocked. Please contact the administrator.");
 		}
 		
 		return new Custom_user_details(user);

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -25,7 +26,11 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         String errorMessage = "Invalid username or password";
         
         // Customize error message based on exception type
-        if (exception instanceof UsernameNotFoundException) {
+        if (exception instanceof LockedException) {
+            errorMessage = exception.getMessage();
+        } else if (exception.getCause() instanceof LockedException) {
+            errorMessage = exception.getCause().getMessage();
+        } else if (exception instanceof UsernameNotFoundException) {
             errorMessage = "User not found. Please check your username or email.";
         } else if (exception instanceof BadCredentialsException) {
             errorMessage = "Incorrect password. Please try again.";
