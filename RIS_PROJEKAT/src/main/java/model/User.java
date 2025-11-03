@@ -6,11 +6,11 @@ import java.util.List;
 
 
 /**
- * The persistent class for the id_users database table.
+ * The persistent class for the users database table.
  * 
  */
 @Entity
-@Table(name="id_users")
+@Table(name="users")
 @NamedQuery(name="User.findAll", query="SELECT u FROM User u")
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -19,7 +19,7 @@ public class User implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 
-	private String clearance;
+	private String role;
 
 	private String email;
 
@@ -71,12 +71,12 @@ public class User implements Serializable {
 		this.id = id;
 	}
 
-	public String getClearance() {
-		return this.clearance;
+	public String getRole() {
+		return this.role;
 	}
 
-	public void setClearance(String clearance) {
-		this.clearance = clearance;
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	public String getEmail() {

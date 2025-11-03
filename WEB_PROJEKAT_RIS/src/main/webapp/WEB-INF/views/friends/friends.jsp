@@ -205,13 +205,13 @@
                                 </div>
                             </div>
                             <div class="friend-actions">
-                                <form action="/FacebookCopy/friends/request/accept/${request.id}" method="POST" style="display: inline;">
+                                <form action="/SocialApp/friends/request/accept/${request.id}" method="POST" style="display: inline;">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                     <button type="submit" class="btn-confirm">
                                         <i class="fas fa-check"></i> Confirm
                                     </button>
                                 </form>
-                                <form action="/FacebookCopy/friends/request/reject/${request.id}" method="POST" style="display: inline;">
+                                <form action="/SocialApp/friends/request/reject/${request.id}" method="POST" style="display: inline;">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                     <button type="submit" class="btn-delete">
                                         <i class="fas fa-times"></i> Delete
@@ -287,7 +287,7 @@
                                             </button>
                                         </c:when>
                                         <c:otherwise>
-                                            <form action="/FacebookCopy/friends/request/send" method="POST" style="display: inline;">
+                                            <form action="/SocialApp/friends/request/send" method="POST" style="display: inline;">
                                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                                 <input type="hidden" name="receiverId" value="${otherUser.id}" />
                                                 <button type="submit" class="btn-add">
@@ -319,9 +319,9 @@ function handleFriendRequestNoCSRF(requestId, action) {
     
     let url;
     if (action === 'accept') {
-        url = '/FacebookCopy/friends/request/accept/' + requestId;
+        url = '/SocialApp/friends/request/accept/' + requestId;
     } else {
-        url = '/FacebookCopy/friends/request/reject/' + requestId;
+        url = '/SocialApp/friends/request/reject/' + requestId;
     }
     
     console.log('Making request to:', url);
@@ -383,7 +383,7 @@ function sendFriendRequestData(buttonElement) {
         console.log('Added CSRF token to request');
     }
     
-    const url = "/FacebookCopy/friends/request/send";
+    const url = "/SocialApp/friends/request/send";
     console.log('Making request to:', url);
     
     // NO HEADERS - let the browser set content-type automatically for FormData
@@ -425,9 +425,9 @@ function testEndpoints() {
     
     // Test if we can reach the endpoints with a simple GET request
     const endpoints = [
-        '/FacebookCopy/friends/request/send',
-        '/FacebookCopy/friends/request/accept/1',
-        '/FacebookCopy/friends/request/reject/1'
+        '/SocialApp/friends/request/send',
+        '/SocialApp/friends/request/accept/1',
+        '/SocialApp/friends/request/reject/1'
     ];
     
     endpoints.forEach(endpoint => {

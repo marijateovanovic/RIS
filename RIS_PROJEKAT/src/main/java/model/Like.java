@@ -8,7 +8,7 @@ import java.sql.Timestamp;
  * The persistent class for the id_likes database table.
  */
 @Entity
-@Table(name="id_likes")
+@Table(name="likes")
 @NamedQuery(name="Like.findAll", query="SELECT l FROM Like l")
 public class Like implements Serializable {
 	private static final long serialVersionUID = 1L;

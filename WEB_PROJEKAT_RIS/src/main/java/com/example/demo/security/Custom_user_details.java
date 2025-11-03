@@ -23,7 +23,7 @@ public class Custom_user_details implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getClearance()));
+		authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
 		return authorities;
 	}
 

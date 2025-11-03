@@ -106,14 +106,14 @@ public class AdminController {
             User userToPromote = userService.findById(userId);
             if (userToPromote != null) {
                 // Proverava da li je korisnik već admin
-                if ("ADMIN".equals(userToPromote.getClearance())) {
+                if ("ADMIN".equals(userToPromote.getRole())) {
                     redirectAttributes.addFlashAttribute("error", 
                         "User '" + userToPromote.getUsername() + "' is already an admin!");
                     return "redirect:/admin/users";
                 }
-                
-                // Postavlja clearance na ADMIN
-                userToPromote.setClearance("ADMIN");
+            
+                // Postavlja role na ADMIN
+                userToPromote.setRole("ADMIN");
                 userService.save(userToPromote);
                 
                 redirectAttributes.addFlashAttribute("success", 

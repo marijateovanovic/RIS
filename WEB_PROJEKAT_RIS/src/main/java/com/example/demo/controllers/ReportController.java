@@ -18,9 +18,9 @@ public class ReportController {
 
     @GetMapping("/users.pdf")
     public void generateUsersReport(HttpServletResponse response,
-                                   @RequestParam(defaultValue = "ALL") String clearance) {
+                                   @RequestParam(defaultValue = "ALL") String role) {
         try {
-            reportService.generateUsersReport(response, clearance);
+            reportService.generateUsersReport(response, role);
         } catch (Exception e) {
             try {
                 response.setContentType("text/html");

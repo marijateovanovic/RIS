@@ -17,7 +17,7 @@ import com.example.demo.services.UserService;
 @RequestMapping("/friends") //sve mape će imati prefiks "/friends"
 public class FriendController {
     
-	//autowired se samo koristi da ne bih morao praviti konstruktor, već automatski instanciram Bean-ove
+	//autowired se samo koristi da se ne pravi konstruktor, već automatski instanciramo Bean-ove
     @Autowired
     private FriendRequestService friendRequestService;
     

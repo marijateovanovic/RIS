@@ -1,0 +1,6 @@
+model/Friendship.class
+model/User.class
+model/FriendRequest.class
+model/Message.class
+model/Like.class
+model/Post.class

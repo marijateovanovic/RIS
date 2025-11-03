@@ -92,7 +92,7 @@ public class MainController {
         
         //setujemo podatke o novom korisniku u bazu
         User user = new User();
-        user.setClearance("USER");
+        user.setRole("USER");
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(generatePassword.encode(password));

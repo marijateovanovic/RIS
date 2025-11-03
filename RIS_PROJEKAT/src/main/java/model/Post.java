@@ -6,11 +6,11 @@ import java.sql.Timestamp;
 
 
 /**
- * The persistent class for the id_posts database table.
+ * The persistent class for the posts database table.
  * 
  */
 @Entity
-@Table(name="id_posts")
+@Table(name="posts")
 @NamedQuery(name="Post.findAll", query="SELECT p FROM Post p")
 public class Post implements Serializable {
 	private static final long serialVersionUID = 1L;

@@ -64,7 +64,7 @@
     <!-- Facebook Header -->
     <div class="facebook-header">
         <div class="facebook-logo">
-            <i class="fab fa-facebook"></i> FacebookCopy
+            <i class="fab fa-facebook"></i> SocialApp
         </div>
     </div>
 
