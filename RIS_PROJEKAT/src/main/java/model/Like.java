@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.sql.Timestamp;
 
 /**
- * The persistent class for the id_likes database table.
+ * The persistent class for the likes database table.
  */
 @Entity
 @Table(name="likes")

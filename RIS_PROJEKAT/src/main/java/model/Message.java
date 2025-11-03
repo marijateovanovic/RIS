@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 
 /**
- * The persistent class for the id_messages database table.
+ * The persistent class for the messages database table.
  * 
  */
 @Entity

@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 
 /**
- * The persistent class for the id_friend_requests database table.
+ * The persistent class for the friend_requests database table.
  * 
  */
 @Entity

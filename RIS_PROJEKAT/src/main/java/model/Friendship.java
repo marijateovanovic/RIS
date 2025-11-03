@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 
 
 /**
- * The persistent class for the id_friendships database table.
+ * The persistent class for the friendships database table.
  * 
  */
 @Entity
